@@ -80,7 +80,7 @@ const Register: React.FC = () => {
           </Button>
           <Grid container justifyContent="flex-end">
             <Grid item>
-              <Link component={RouterLink} to="/home" variant="body2" style={{ marginTop: 20 }}>
+              <Link component={RouterLink} to="/login" variant="body2" style={{ marginTop: 20 }}>
                 Already have an account? Log in
               </Link>
             </Grid>

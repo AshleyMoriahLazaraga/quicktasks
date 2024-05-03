@@ -1,10 +1,11 @@
 // App.tsx
 import React from 'react';
-import './App.css';
 import { Route, BrowserRouter as Router, Routes } from 'react-router-dom';
-import Register from './pages/Register';
-import Home from './pages/Home';
+import './App.css';
 import { UserProvider } from './contexts/UserContext'; // Adjust the import path as necessary
+import Home from './pages/Home';
+import Login from './pages/Login';
+import Register from './pages/Register';
 
 const App: React.FC = () => {
   return (
@@ -16,7 +17,8 @@ const App: React.FC = () => {
             <Route path="/login" element={<Login/>} /> */}
             {/* <Route path="/" element={<Register/>} />
             <Route path="/register" element={<Register/>} /> */}
-            <Route path="/" element={<Register />} />
+            <Route path="/" element={<Login />} />
+            <Route path="/register" element={<Register/>} />
             <Route path="/home" element={<Home />} />
           </Routes>
         </UserProvider>
