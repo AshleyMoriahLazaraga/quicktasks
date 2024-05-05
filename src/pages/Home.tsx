@@ -1,26 +1,64 @@
+// Home.tsx
 import React, { Component } from 'react';
 import TaskList from '../components/TaskList';
 import TaskForm from '../components/TaskForm';
-import SettingsButton from '../components/SettingsButton';
-import '../Home.css'; // Import the CSS file for styling
+import { UserContext } from '../contexts/UserContext';
+import supabase from '../supabaseClient';
+
+import '../Home.css';
 
 interface State {
-  currentCategory: string;
   tasks: { [key: string]: string[] };
   showAddCategoryInput: boolean;
   newCategoryName: string;
+  categoryNames: string[];
 }
 
 class Home extends Component<{}, State> {
+  static contextType = UserContext;
+
   constructor(props: {}) {
     super(props);
     this.state = {
-      currentCategory: 'SCHOOL',
-      tasks: { SCHOOL: [] },
+      tasks: {},
       showAddCategoryInput: false,
       newCategoryName: '',
+      categoryNames: [],
     };
   }
+
+  async componentDidMount() {
+    console.log("Component mounted");
+    await this.fetchCategories();
+  }
+
+  fetchCategories = async () => {
+    try {
+      const { user } = this.context;
+      console.log("User:", user); // Check if user object is received
+      if (user) {
+        const { data: categories, error } = await supabase
+          .from('category')
+          .select('category_name')
+          .eq('user_id', user.user_id);
+
+        console.log("Categories:", categories); // Check if categories are fetched
+        console.log("Error:", error); // Check if there's any error
+
+        if (error) {
+          throw error;
+        }
+
+        if (categories) {
+          const categoryNames = categories.map((category: any) => category.category_name);
+          this.setState({ categoryNames });
+          localStorage.setItem('categories', JSON.stringify(categoryNames)); // Save categories to local storage
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching categories:', error.message);
+    }
+  };
 
   handleAddTask = (category: string, newTask: string) => {
     this.setState((prevState) => ({
@@ -29,10 +67,6 @@ class Home extends Component<{}, State> {
         [category]: [...prevState.tasks[category], newTask],
       },
     }));
-  };
-
-  handleCategoryChange = (newCategory: string) => {
-    this.setState({ currentCategory: newCategory });
   };
 
   handleToggleAddCategoryInput = () => {
@@ -45,25 +79,48 @@ class Home extends Component<{}, State> {
     this.setState({ newCategoryName: event.target.value });
   };
 
-  handleAddCategory = () => {
-    const { newCategoryName } = this.state;
-    if (newCategoryName.trim()) {
-      this.setState((prevState) => ({
-        tasks: { ...prevState.tasks, [newCategoryName]: [] },
-        newCategoryName: '',
-        showAddCategoryInput: false,
-      }));
+  handleAddCategory = async () => {
+    const { newCategoryName, categoryNames } = this.state;
+    const { user } = this.context;
+
+    if (newCategoryName.trim() && user) {
+      try {
+        const { data, error } = await supabase.from('category').insert([
+          { category_name: newCategoryName, user_id: user.user_id },
+        ]);
+
+        if (error) {
+          console.error('Error adding category:', error.message);
+        } else {
+          const insertedCategory = data?.[0];
+          const updatedCategoryNames = [...categoryNames, insertedCategory.category_name];
+          this.setState({
+            tasks: { ...this.state.tasks, [insertedCategory.category_name]: [] },
+            newCategoryName: '',
+            showAddCategoryInput: false,
+            categoryNames: updatedCategoryNames,
+          });
+        }
+      } catch (error) {
+        console.error('Error adding category:', error.message);
+      }
     }
   };
 
   render() {
-    const { currentCategory, tasks, showAddCategoryInput, newCategoryName } = this.state;
+    const { tasks, showAddCategoryInput, newCategoryName, categoryNames } = this.state;
+    const { user } = this.context;
+
     return (
       <div className="app">
         <aside className="sidebar">
           <h2>QuickTasks</h2>
+          {user && (
+            <div>
+              <p>{user.email}</p>
+            </div>
+          )}
           <nav className="nav">
-            <SettingsButton />
             <button onClick={this.handleToggleAddCategoryInput}>Add Category</button>
             {showAddCategoryInput && (
               <div>
@@ -76,17 +133,28 @@ class Home extends Component<{}, State> {
                 <button onClick={this.handleAddCategory}>Save</button>
               </div>
             )}
-            {Object.keys(tasks).map((category) => (
-              <button key={category} onClick={() => this.handleCategoryChange(category)}>
+            {categoryNames.map((category) => (
+              <button key={category} onClick={() => console.log(category)}>
                 {category}
               </button>
             ))}
           </nav>
         </aside>
         <main>
-          <h1>{currentCategory} Tasks</h1>
-          <TaskList tasks={tasks[currentCategory]} />
-          <TaskForm onAddTask={this.handleAddTask} currentCategory={currentCategory} />
+          {Object.keys(tasks).length > 0 ? (
+            <>
+              <h1>Tasks</h1>
+              {Object.keys(tasks).map((category) => (
+                <div key={category}>
+                  <h2>{category}</h2>
+                  <TaskList tasks={tasks[category]} />
+                  <TaskForm onAddTask={this.handleAddTask} currentCategory={category} />
+                </div>
+              ))}
+            </>
+          ) : (
+            <h1>No categories added yet</h1>
+          )}
         </main>
       </div>
     );
