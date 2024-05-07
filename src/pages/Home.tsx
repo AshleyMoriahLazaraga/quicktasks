@@ -1,7 +1,4 @@
-// Home.tsx
 import React, { Component } from 'react';
-import TaskList from '../components/TaskList';
-import TaskForm from '../components/TaskForm';
 import { UserContext } from '../contexts/UserContext';
 import supabase from '../supabaseClient';
 
@@ -12,6 +9,7 @@ interface State {
   showAddCategoryInput: boolean;
   newCategoryName: string;
   categoryNames: string[];
+  selectedCategory: string | null; // Track the selected category
 }
 
 class Home extends Component<{}, State> {
@@ -24,6 +22,7 @@ class Home extends Component<{}, State> {
       showAddCategoryInput: false,
       newCategoryName: '',
       categoryNames: [],
+      selectedCategory: null, // Initialize selected category to null
     };
   }
 
@@ -52,21 +51,11 @@ class Home extends Component<{}, State> {
         if (categories) {
           const categoryNames = categories.map((category: any) => category.category_name);
           this.setState({ categoryNames });
-          localStorage.setItem('categories', JSON.stringify(categoryNames)); // Save categories to local storage
         }
       }
     } catch (error) {
       console.error('Error fetching categories:', error.message);
     }
-  };
-
-  handleAddTask = (category: string, newTask: string) => {
-    this.setState((prevState) => ({
-      tasks: {
-        ...prevState.tasks,
-        [category]: [...prevState.tasks[category], newTask],
-      },
-    }));
   };
 
   handleToggleAddCategoryInput = () => {
@@ -82,24 +71,28 @@ class Home extends Component<{}, State> {
   handleAddCategory = async () => {
     const { newCategoryName, categoryNames } = this.state;
     const { user } = this.context;
-
+  
     if (newCategoryName.trim() && user) {
       try {
-        const { data, error } = await supabase.from('category').insert([
+        // Insert the category into the database
+        await supabase.from('category').insert([
           { category_name: newCategoryName, user_id: user.user_id },
         ]);
-
-        if (error) {
-          console.error('Error adding category:', error.message);
-        } else {
-          const insertedCategory = data?.[0];
-          const updatedCategoryNames = [...categoryNames, insertedCategory.category_name];
+  
+        // Check if the newly added category already exists in the categoryNames array
+        if (!categoryNames.includes(newCategoryName)) {
+          // Log to track when a category is being added
+          console.log(`Adding category: ${newCategoryName}`);
+  
+          // Update local state with the newly added category only if it doesn't already exist
+          const updatedCategoryNames = [...categoryNames, newCategoryName];
           this.setState({
-            tasks: { ...this.state.tasks, [insertedCategory.category_name]: [] },
+            tasks: { ...this.state.tasks, [newCategoryName]: [] },
             newCategoryName: '',
-            showAddCategoryInput: false,
             categoryNames: updatedCategoryNames,
           });
+        } else {
+          console.log(`Category already exists: ${newCategoryName}`);
         }
       } catch (error) {
         console.error('Error adding category:', error.message);
@@ -107,8 +100,12 @@ class Home extends Component<{}, State> {
     }
   };
 
+  handleCategoryClick = (category: string) => {
+    this.setState({ selectedCategory: category });
+  };
+
   render() {
-    const { tasks, showAddCategoryInput, newCategoryName, categoryNames } = this.state;
+    const { showAddCategoryInput, newCategoryName, categoryNames, selectedCategory } = this.state;
     const { user } = this.context;
 
     return (
@@ -130,30 +127,24 @@ class Home extends Component<{}, State> {
                   onChange={this.handleNewCategoryNameChange}
                   placeholder="Enter new category name"
                 />
-                <button onClick={this.handleAddCategory}>Save</button>
+                <button onClick={() => {
+                  this.handleAddCategory();
+                  this.setState({ showAddCategoryInput: false });
+                }}>Save</button>
               </div>
             )}
-            {categoryNames.map((category) => (
-              <button key={category} onClick={() => console.log(category)}>
+            {categoryNames.map((category, index) => (
+              <button key={index} onClick={() => this.handleCategoryClick(category)}>
                 {category}
               </button>
             ))}
           </nav>
         </aside>
         <main>
-          {Object.keys(tasks).length > 0 ? (
-            <>
-              <h1>Tasks</h1>
-              {Object.keys(tasks).map((category) => (
-                <div key={category}>
-                  <h2>{category}</h2>
-                  <TaskList tasks={tasks[category]} />
-                  <TaskForm onAddTask={this.handleAddTask} currentCategory={category} />
-                </div>
-              ))}
-            </>
+          {selectedCategory ? (
+            <h1>{selectedCategory} Tasks</h1>
           ) : (
-            <h1>No categories added yet</h1>
+            <h1>Select a category</h1>
           )}
         </main>
       </div>
