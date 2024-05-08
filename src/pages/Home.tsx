@@ -110,42 +110,42 @@ class Home extends Component<{}, State> {
 
     return (
       <div className="app">
-        <aside className="sidebar">
-          <h2>QuickTasks</h2>
-          {user && (
-            <div>
-              <p>{user.email}</p>
-            </div>
-          )}
-          <nav className="nav">
-            <button onClick={this.handleToggleAddCategoryInput}>Add Category</button>
-            {showAddCategoryInput && (
-              <div>
-                <input
-                  type="text"
-                  value={newCategoryName}
-                  onChange={this.handleNewCategoryNameChange}
-                  placeholder="Enter new category name"
-                />
-                <button onClick={() => {
-                  this.handleAddCategory();
-                  this.setState({ showAddCategoryInput: false });
-                }}>Save</button>
-              </div>
-            )}
-            {categoryNames.map((category, index) => (
-              <button key={index} onClick={() => this.handleCategoryClick(category)}>
-                {category}
-              </button>
-            ))}
-          </nav>
-        </aside>
         <main>
           {selectedCategory ? (
-            <h1>{selectedCategory} Tasks</h1>
+            <h1 className="pageTitle">{selectedCategory} Tasks</h1>
           ) : (
-            <h1>Select a category</h1>
+            <h1 className="pageTitle">Select a category</h1>
           )}
+          <aside className="sidebar">
+            <h2>QuickTasks</h2>
+            {user && (
+              <div>
+                <p>{user.email}</p>
+              </div>
+            )}
+            <nav className="nav">
+              <button onClick={this.handleToggleAddCategoryInput}>Add Category</button>
+              {showAddCategoryInput && (
+                <div>
+                  <input
+                    type="text"
+                    value={newCategoryName}
+                    onChange={this.handleNewCategoryNameChange}
+                    placeholder="Enter new category name"
+                  />
+                  <button onClick={() => {
+                    this.handleAddCategory();
+                    this.setState({ showAddCategoryInput: false });
+                  }}>Save</button>
+                </div>
+              )}
+              {categoryNames.map((category, index) => (
+                <button key={index} onClick={() => this.handleCategoryClick(category)}>
+                  {category}
+                </button>
+              ))}
+            </nav>
+          </aside>
         </main>
       </div>
     );

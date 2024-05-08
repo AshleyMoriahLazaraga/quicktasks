@@ -2,6 +2,13 @@
   display: flex;
 }
 
+.pageTitle {
+  margin-top: 20px;
+  margin-left: 240px; /* Adjust according to sidebar width */
+  color: white;
+  font-size: 40px;
+}
+
 .sidebar {
   width: 200px;
   padding: 20px;
