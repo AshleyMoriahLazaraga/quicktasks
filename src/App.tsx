@@ -18,6 +18,7 @@ const App: React.FC = () => {
             {/* <Route path="/" element={<Register/>} />
             <Route path="/register" element={<Register/>} /> */}
             <Route path="/" element={<Login />} />
+            <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register/>} />
             <Route path="/home" element={<Home />} />
           </Routes>

@@ -1,7 +1,9 @@
-import { Button, Container, Grid, Link, Paper, TextField, Typography } from '@mui/material';
+import { Button, Grid, InputAdornment, Link, TextField, Typography } from '@mui/material';
 import React, { FormEvent, useState } from 'react';
+import { MdOutlineLock, MdOutlineMailOutline } from "react-icons/md";
 import { Link as RouterLink, useNavigate } from 'react-router-dom'; // For navigation after login
 import { useUser } from '../contexts/UserContext'; // Adjust the import path as necessary
+import logoDark from '../images/logo_dark.png';
 import supabase from '../supabaseClient'; // Make sure this points to your Supabase client initialization
 
 const Login: React.FC = () => {
@@ -33,50 +35,91 @@ const Login: React.FC = () => {
     }
   };
 
+  const handleRegister = () => {
+    navigate('/register');
+  }
+
   return (
-    <Container component="main" maxWidth="xs">
-      <Paper elevation={0} style={{ padding: 20, marginTop: 50 }}>
-        <Typography variant="h5" component="h2" gutterBottom style={{ fontWeight: 'bold' }}>
-          Login
-        </Typography>
-        <form onSubmit={handleSubmit}>
-          <Grid container spacing={2}>
-            <Grid item xs={12}>
+    <Grid container direction="column" style={{ height: '200vh', width: '100vw' }}>
+    {/* Left Part */}
+    <Grid item xs={9} style={{ backgroundColor: '#202124'}}>
+      <Grid container direction="column" justifyContent="center" alignItems="center" spacing={2}>
+        <Grid item>
+          <img src={logoDark} alt="Logo" style={{ width: 100, height: 'auto', marginTop:120 }} />
+        </Grid>
+        <Grid item>
+          <Typography variant="h4" component="h2" gutterBottom style={{ fontWeight: 'bold', color: '#fff', fontFamily: 'Tahoma'}}>
+            Sign in to QuickTasks
+          </Typography>
+        </Grid>
+        <form onSubmit={handleSubmit} style={{marginTop: 50}}>
+          <Grid container direction="column" spacing={2}>
+            <Grid item>
               <TextField
-                label="Email"
                 id="email"
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                fullWidth
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <MdOutlineMailOutline  style={{color: '#B8DBD9'}}/>
+                    </InputAdornment>
+                  ),
+                  placeholder: 'Email',
+                  style: { borderRadius: 10, color: '#B8DBD9', backgroundColor: '#2F4550', fontFamily: 'Tahoma'}
+                }}
+                style={{width:'35vw', borderRadius: 10, color: '#B8DBD9', fontFamily: 'Tahoma'}}
               />
             </Grid>
-            <Grid item xs={12}>
+            <Grid item>
               <TextField
-                label="Password"
                 id="password"
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                fullWidth
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <MdOutlineLock style={{color: '#B8DBD9'}}/>
+                    </InputAdornment>
+                  ),
+                  placeholder: 'Password',
+                  style: { borderRadius: 10, color: '#B8DBD9', backgroundColor: '#2F4550', fontFamily: 'Tahoma' }
+                }}
+                style={{width:'35vw', borderRadius: 10, color: '#B8DBD9', fontFamily: 'Tahoma'}}
               />
             </Grid>
           </Grid>
-          <Button type="submit" variant="contained" color="primary" fullWidth style={{ marginTop: 20 }}>
-            Login
-          </Button>
-          <Grid container justifyContent="flex-end">
-            <Grid item>
-              <Link component={RouterLink} to="/register" variant="body2" style={{ marginTop: 20 }}>
-                Don't have an account? Sign up!
+          <Grid item style={{marginTop: 20}}>
+              <Link component={RouterLink} to="/register" variant="body2" style={{fontFamily:'Tahoma', color: '#B8DBD9'}}>
+                Forgot your password
+                {/*supposed to be reset password */}
               </Link>
             </Grid>
-          </Grid>
+          <Button type="submit" variant="contained" color="primary" style={{ marginTop: 50, width: '15vw', height: '6vh',  backgroundColor: '#2F4550', color: '#B8DBD9', borderRadius: 30, fontWeight: 'bold', fontSize: '15px', fontFamily: 'Tahoma' }}>
+            SIGN IN
+          </Button>
         </form>
-      </Paper>
-    </Container>
+      </Grid>
+    </Grid>
+    {/* Right Part */}
+    <Grid item xs={6} alignItems="center" justifyContent="center" display={'flex'} style={{ backgroundColor: '#B8DBD9', padding: 20 }}>
+      <Grid item justifyItems={'center'}>
+        <Typography variant="h4" component="h2" gutterBottom style={{ fontWeight: 'bold', color: '#31363F', fontFamily: 'Tahoma'}}>
+              Hello, Friend!
+        </Typography>
+        <Typography variant="h6" component="h2" gutterBottom style={{color: '#31363F', fontFamily: 'Tahoma'}}>
+        Create an account and get started!
+        </Typography>
+        <Button variant="contained" color="primary" style={{ marginTop: 20, width: '15vw', backgroundColor: '#B8DBD9', color: '#31363F', borderRadius: 30, border: '2px solid #31363F', fontWeight: 'bold', fontFamily: 'Tahoma'}} onClick={handleRegister}>
+            SIGN UP
+        </Button>
+      </Grid>
+    </Grid>
+  </Grid>
   );
 };
 

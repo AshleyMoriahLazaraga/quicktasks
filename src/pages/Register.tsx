@@ -1,12 +1,16 @@
-import { Button, Container, Grid, Link, Paper, TextField, Typography } from '@mui/material';
+import { Button, Grid, InputAdornment, TextField, Typography } from '@mui/material';
 import React, { FormEvent, useState } from 'react';
-import { Link as RouterLink } from 'react-router-dom';
+import { IoPersonOutline } from "react-icons/io5";
+import { MdOutlineLock, MdOutlineMailOutline } from "react-icons/md";
+import { useNavigate } from 'react-router-dom';
+import logoLight from '../images/logo_light.png';
 import supabase from '../supabaseClient';
 
 const Register: React.FC = () => {
   const [username, setUsername] = useState<string>('');
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
+  const navigate = useNavigate();
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault();
@@ -33,61 +37,114 @@ const Register: React.FC = () => {
       }
   };
 
+  const handleLogin = () => {
+    navigate('/login');
+  }
+
   return (
-<Container component="main" maxWidth="xs">
-      <Paper elevation={0} style={{ padding: 20, marginTop: 50 }}>
-        <Typography variant="h4" component="h2" gutterBottom style={{ fontWeight: 'bold' }}>
-          Register
-        </Typography>
-        <form onSubmit={handleSubmit}>
-          <Grid container spacing={3}>
-            <Grid item xs={12}>
-              <TextField
-                label="Username"
-                id="username"
-                type="text"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                required
-                fullWidth
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <TextField
-                label="Email"
-                id="email"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                fullWidth
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <TextField
-                label="Password"
-                id="password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                fullWidth
-              />
-            </Grid>
+    <Grid container direction='column'
+      style={{
+        height: '200vh', width: '100vw'
+      }}>
+      <Grid item xs={6} style={{ backgroundColor: '#B8DBD9'}}>
+        <Grid container direction="column" justifyContent="center" alignItems="center" spacing={2}>
+          <Grid item>
+            <img src={logoLight} alt="Logo"
+              style={{ width: 100, height: 'auto', marginTop:120 }} />
           </Grid>
-          <Button type="submit" variant="contained" color="primary" fullWidth style={{ marginTop: 20 }}>
-            Register
+
+          <Typography variant="h4" component="h2" gutterBottom style={{ fontWeight: 'bold', color: '#31363F', fontFamily:   'Tahoma', marginTop: 40}}>
+              Welcome Back!
+          </Typography>
+
+          <Typography variant="h6" component="h2" gutterBottom style={{color: '#31363F', fontFamily: 'Tahoma', marginTop: 60}}>
+            Stay in touch! Sign in with your info.
+          </Typography>
+
+          <Button variant="contained" color="primary" style={{ marginTop: 50, width: '15vw', backgroundColor: '#B8DBD9', color: '#31363F', borderRadius: 30, border: '2px solid #31363F', fontWeight: 'bold', fontFamily: 'Tahoma'}} onClick={handleLogin}>
+            SIGN IN
           </Button>
-          <Grid container justifyContent="flex-end">
-            <Grid item>
-              <Link component={RouterLink} to="/login" variant="body2" style={{ marginTop: 20 }}>
-                Already have an account? Log in
-              </Link>
-            </Grid>
+        </Grid>
+      </Grid>
+      
+      <Grid item xs={9} style={{backgroundColor: '#202124', padding: 20,}} >
+        <Grid container direction="column" justifyContent="center" alignItems="center" spacing={2}>
+          <Grid item>
+            <Typography variant="h4" component="h2" gutterBottom style={{ fontWeight: 'bold', color: '#B8DBD9', fontFamily: 'Tahoma', marginTop: 150}}>
+              Create an Account
+            </Typography>
           </Grid>
-        </form>
-      </Paper>
-    </Container>
+
+          <form onSubmit={handleSubmit} style={{marginTop: 50}}>
+            <Grid container direction="column" spacing={2}>
+              <Grid item>
+                <TextField
+                  id="username"
+                  type="username"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  required
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <IoPersonOutline style={{color: '#B8DBD9'}}/>                    
+                      </InputAdornment>
+                    ),
+                    placeholder: 'Username',
+                    style: { borderRadius: 10, color: '#B8DBD9', backgroundColor: '#2F4550', fontFamily: 'Tahoma' }
+                  }}
+                  style={{width:'35vw', borderRadius: 10, color: '#B8DBD9', fontFamily: 'Tahoma'}}
+                />
+              </Grid>
+              
+              <Grid item>
+                <TextField
+                  id="email"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <MdOutlineMailOutline  style={{color: '#B8DBD9'}}/>
+                      </InputAdornment>
+                    ),
+                    placeholder: 'Email',
+                    style: { borderRadius: 10, color: '#B8DBD9', backgroundColor: '#2F4550', fontFamily: 'Tahoma'}
+                  }}
+                  style={{width:'35vw', borderRadius: 10, color: '#B8DBD9', fontFamily: 'Tahoma'}}
+                />
+              </Grid>
+
+              <Grid item>
+                <TextField
+                  id="password"
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <MdOutlineLock style={{color: '#B8DBD9'}}/>
+                      </InputAdornment>
+                    ),
+                    placeholder: 'Password',
+                    style: { borderRadius: 10, color: '#B8DBD9', backgroundColor: '#2F4550',fontFamily: 'Tahoma' }
+                  }}
+                  style={{width:'35vw', borderRadius: 10, color: '#B8DBD9', fontFamily: 'Tahoma'}}
+                />
+              </Grid>
+            </Grid>
+            
+            <Button type="submit" variant="contained" color="primary" style={{ marginTop: 50, width: '15vw', height: '6vh',  backgroundColor: '#2F4550', color: '#B8DBD9', borderRadius: 30, fontWeight: 'bold', fontFamily: 'Tahoma'}}>
+              SIGN UP
+            </Button>
+          </form>
+        </Grid>
+      </Grid>
+    </Grid>
   );
 };
 
