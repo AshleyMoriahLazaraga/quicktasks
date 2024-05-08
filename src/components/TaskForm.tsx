@@ -19,7 +19,7 @@ function TaskForm({ onAddTask, currentCategory }) {
         id="new-task"
         value={newTaskText}
         onChange={(e) => setNewTaskText(e.target.value)}
-        placeholder="Enter task description"
+        placeholder="Enter task"
       />
       <button type="submit">Add</button>
     </form>

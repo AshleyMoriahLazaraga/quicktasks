@@ -1,0 +1,22 @@
+.app {
+  display: flex;
+}
+
+.sidebar {
+  width: 200px;
+  padding: 20px;
+  background-color: #0f0d0d;
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+}
+
+.nav {
+  display: flex;
+  flex-direction: column;
+}
+
+.nav button {
+  margin-bottom: 10px;
+}
