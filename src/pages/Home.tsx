@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { UserContext } from '../contexts/UserContext';
 import supabase from '../supabaseClient';
+import DeleteIcon from '@mui/icons-material/Delete';
 
 import '../Home.css';
 
