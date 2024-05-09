@@ -99,6 +99,32 @@ class Home extends Component<{}, State> {
       }
     }
   };
+  // NEWLY ADDED BY MEE - MARIB
+  handleDeleteCategory = async (category: string) => {
+    const { categoryNames } = this.state;
+    const { user } = this.context;
+  
+    try {
+      // Delete the category from the database
+      await supabase.from('category').delete().eq('category_name', category).eq('user_id', user.user_id);
+  
+      // Remove the deleted category from the local state
+      const updatedCategoryNames = categoryNames.filter(cat => cat !== category);
+      this.setState({
+        categoryNames: updatedCategoryNames,
+        tasks: { ...this.state.tasks, [category]: undefined } // Remove tasks associated with the deleted category
+      });
+    } catch (error) {
+      console.error('Error deleting category:', error.message);
+    }
+  };
+
+  confirmDeleteCategory = (category: string) => {
+    const confirmDelete = window.confirm("Are you absolutely sure about deleting this quick category?");
+    if (confirmDelete) {
+      this.handleDeleteCategory(category);
+    }
+  };
 
   handleCategoryClick = (category: string) => {
     this.setState({ selectedCategory: category });
@@ -140,9 +166,14 @@ class Home extends Component<{}, State> {
                 </div>
               )}
               {categoryNames.map((category, index) => (
-                <button key={index} onClick={() => this.handleCategoryClick(category)}>
-                  {category}
-                </button>
+                <div key={index} className="categoryRow">
+                  <button className="categoryButton" onClick={() => this.handleCategoryClick(category)}>
+                    {category}
+                  </button>
+                  <button className="deleteButton" onClick={() => this.confirmDeleteCategory(category)}>
+                    Delete
+                  </button>
+                </div>
               ))}
             </nav>
           </aside>
