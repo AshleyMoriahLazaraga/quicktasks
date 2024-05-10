@@ -2,8 +2,13 @@ import React, { Component } from 'react';
 import { UserContext } from '../contexts/UserContext';
 import supabase from '../supabaseClient';
 import DeleteIcon from '@mui/icons-material/Delete';
-
+import MoreVertIcon from '@mui/icons-material/MoreVert';
+import Menu from '@mui/material/Menu';
+import MenuItem from '@mui/material/MenuItem';
+import IconButton from '@mui/material/IconButton';
 import '../Home.css';
+import { MoreVert } from '@mui/icons-material';
+
 
 interface State {
   tasks: { [key: string]: string[] };
@@ -11,6 +16,7 @@ interface State {
   newCategoryName: string;
   categoryNames: string[];
   selectedCategory: string | null; // Track the selected category
+  anchorEl: HTMLElement | null;
 }
 
 class Home extends Component<{}, State> {
@@ -23,7 +29,8 @@ class Home extends Component<{}, State> {
       showAddCategoryInput: false,
       newCategoryName: '',
       categoryNames: [],
-      selectedCategory: null, // Initialize selected category to null
+      selectedCategory: null,
+      anchorEl: null, // Initialize selected category to null
     };
   }
 
@@ -118,10 +125,40 @@ class Home extends Component<{}, State> {
     } catch (error) {
       console.error('Error deleting category:', error.message);
     }
+    console.log('Delete category:', category);
+    this.setState({ anchorEl: null });
   };
+  
+  handleEditCategory = async (newCategoryName) => {
+    const { selectedCategory, categoryNames } = this.state;
+    const { user } = this.context;
+
+    try {
+        // Update the category name in the database
+        await supabase
+            .from('category')
+            .update({ category_name: newCategoryName })
+            .eq('category_name', selectedCategory)
+            .eq('user_id', user.user_id);
+
+        // Update the category name in the local state
+        const updatedCategoryNames = categoryNames.map((category) =>
+            category === selectedCategory ? newCategoryName : category
+        );
+
+        this.setState({
+            categoryNames: updatedCategoryNames,
+            selectedCategory: newCategoryName // Update the selected category name if needed
+        });
+    } catch (error) {
+        console.error('Error editing category:', error.message);
+    }
+
+    this.setState({ anchorEl: null }); // Close the menu
+};
 
   confirmDeleteCategory = (category: string) => {
-    const confirmDelete = window.confirm("Are you absolutely sure about deleting this quick category?");
+    const confirmDelete = window.confirm("Are you absolutely sure about deleting this category?");
     if (confirmDelete) {
       this.handleDeleteCategory(category);
     }
@@ -129,10 +166,27 @@ class Home extends Component<{}, State> {
 
   handleCategoryClick = (category: string) => {
     this.setState({ selectedCategory: category });
-  };
+    // Remove active class from previously active category
+    const prevActiveCategory = document.querySelector('.categoryRow.active');
+    if (prevActiveCategory) {
+      prevActiveCategory.classList.remove('active');
+    }
 
+    // Add active class to the clicked category
+    const clickedCategory = document.getElementById(category);
+    if (clickedCategory) {
+      clickedCategory.classList.add('active');
+    }
+  };
+  handleMenuOpen = (event, category) => {
+    this.setState({ anchorEl: event.currentTarget, selectedCategory: category });
+  };
+  
+  handleMenuClose = () => {
+    this.setState({ anchorEl: null });
+  };
   render() {
-    const { showAddCategoryInput, newCategoryName, categoryNames, selectedCategory } = this.state;
+    const { showAddCategoryInput, newCategoryName, categoryNames, selectedCategory, anchorEl } = this.state;
     const { user } = this.context;
 
     return (
@@ -143,14 +197,27 @@ class Home extends Component<{}, State> {
           ) : (
             <h1 className="pageTitle">Select a category</h1>
           )}
-          <aside className="sidebar">
-            <h2>QuickTasks</h2>
+          <aside style={{ backgroundColor: '#202124', color: '#B8DBD9' }}className="sidebar">
+            <img src="src\images\logo_dark.png" alt="Logo" />
             {user && (
               <div>
-                <p>{user.email}</p>
+                <p>{user.email}</p><br></br>
               </div>
             )}
             <nav className="nav">
+              {categoryNames.map((category, index) => (
+                <div key={index} id={category} className="categoryRow">
+                  <div key={index} id={category}  onClick={() => this.handleCategoryClick(category)}>
+                    {category}
+                  </div>
+                  <IconButton aria-label="more" aria-controls="long-menu" aria-haspopup="true" onClick={(event) => this.handleMenuOpen(event, category)}>
+                    <MoreVertIcon />
+                  </IconButton>
+                  <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={this.handleMenuClose}                  >
+                    <MenuItem onClick={() => this.confirmDeleteCategory(selectedCategory)}>Delete</MenuItem>
+                  </Menu>
+                </div>             
+              ))}
               <button onClick={this.handleToggleAddCategoryInput}>Add Category</button>
               {showAddCategoryInput && (
                 <div>
@@ -166,16 +233,7 @@ class Home extends Component<{}, State> {
                   }}>Save</button>
                 </div>
               )}
-              {categoryNames.map((category, index) => (
-                <div key={index} className="categoryRow">
-                  <button className="categoryButton" onClick={() => this.handleCategoryClick(category)}>
-                    {category}
-                  </button>
-                  <button className="deleteButton" onClick={() => this.confirmDeleteCategory(category)}>
-                    Delete
-                  </button>
-                </div>
-              ))}
+              
             </nav>
           </aside>
         </main>

@@ -5,14 +5,16 @@
 .pageTitle {
   margin-top: 20px;
   margin-left: 240px; /* Adjust according to sidebar width */
-  color: white;
+  color: #586F7C;
   font-size: 40px;
+  padding: 20px;
+  vertical-align: top;
 }
 
 .sidebar {
   width: 200px;
   padding: 20px;
-  background-color: #0f0d0d;
+  background-color: #202124;
   position: fixed;
   top: 0;
   left: 0;
@@ -26,4 +28,24 @@
 
 .nav button {
   margin-bottom: 10px;
+}
+
+.categoryRow {
+  padding: 5px; /* Adjust padding as needed */
+  cursor: pointer;
+  text-align: left;
+  line-height: 1.5; /* Adjust line height */
+  transition: background-color 0.5s; /* Smooth transition for background color change */
+  font-size: 1.2em;
+  display: flex;
+  align-items: flex;
+  justify-content: space-between;
+}
+
+.categoryRow:hover {
+  background-color: #939ab4; /* Change background color on hover */
+}
+
+.categoryRow.active {
+  font-weight: bold;
 }
