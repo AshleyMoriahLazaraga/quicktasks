@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import supabase from '../supabaseClient';
 
-function TaskForm({ onAddTask, currentCategory }) {
+function TaskForm({ onAddTask, user_id, selectedCategory }) {
   const [taskData, setTaskData] = useState({
     title: '',
     description: '',
@@ -21,7 +21,13 @@ function TaskForm({ onAddTask, currentCategory }) {
       try {
         // Call the onAddTask function to save the task to the Supabase database
         await supabase.from('task').insert([
-          { title: title, description: description, dueDate: dueDate },
+          { 
+            title: title, 
+            description: description, 
+            dueDate: dueDate,
+            user_id: user_id,  // Include user_id
+            category_id: selectedCategory  // Include category_id
+          },
         ]);
 
         // Clear form fields after task is successfully added

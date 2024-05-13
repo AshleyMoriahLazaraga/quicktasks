@@ -197,10 +197,18 @@ class Home extends Component<{}, State> {
 
   handleAddTask = async (newTaskData) => {
     const { selectedCategory } = this.state;
-    if (selectedCategory) {
+    const { user } = this.context;
+    
+    if (selectedCategory && user) {
       try {
         // Add the task to the Supabase database
-        await supabase.from('task').insert([{ ...newTaskData, category: selectedCategory }]);
+        await supabase.from('task').insert([
+          { 
+            ...newTaskData, 
+            user_id: user.user_id,  // Include user_id
+            category_id: selectedCategory  // Include category_id
+          }
+        ]);
         
         // You might also want to fetch the tasks again after adding a new one
         // to ensure the UI is updated with the latest data
@@ -212,6 +220,7 @@ class Home extends Component<{}, State> {
       console.error('No category selected for the task.');
     }
   };
+  
 
   render() {
     const { showAddCategoryInput, newCategoryName, categoryNames, selectedCategory, anchorEl, showAddTaskSidebar } = this.state;
@@ -230,7 +239,12 @@ class Home extends Component<{}, State> {
             <button onClick={this.toggleAddTaskSidebar}>+ Add Task</button>
           </div>
             <aside style={{ backgroundColor: '#202124', color: '#B8DBD9' }}className="taskbar">
-            <TaskForm onAddTask={this.handleAddTask} currentCategory={undefined} />
+            <TaskForm 
+              onAddTask={this.handleAddTask} 
+              user_id={user.user_id} 
+              selectedCategory={selectedCategory} 
+            />
+
             </aside>
 
           <aside style={{ backgroundColor: '#202124', color: '#B8DBD9' }}className="sidebar">
