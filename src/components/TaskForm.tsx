@@ -22,11 +22,12 @@ function TaskForm({ onAddTask, user_id, selectedCategory }) {
         // Call the onAddTask function to save the task to the Supabase database
         await supabase.from('task').insert([
           { 
+            user_id: user_id,  // Include user_id
+            category_id: selectedCategory,  // Include category_id
             title: title, 
             description: description, 
-            dueDate: dueDate,
-            user_id: user_id,  // Include user_id
-            category_id: selectedCategory  // Include category_id
+            // dueDate: dueDate,
+            dueDate: new Date(dueDate),
           },
         ]);
 

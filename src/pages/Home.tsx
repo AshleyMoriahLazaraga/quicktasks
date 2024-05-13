@@ -204,9 +204,9 @@ class Home extends Component<{}, State> {
         // Add the task to the Supabase database
         await supabase.from('task').insert([
           { 
-            ...newTaskData, 
             user_id: user.user_id,  // Include user_id
-            category_id: selectedCategory  // Include category_id
+            category_id: selectedCategory,  // Include category_id
+            ...newTaskData, 
           }
         ]);
         
