@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import supabase from '../supabaseClient';
 import { UserContext } from '../contexts/UserContext';
+import Home from '../pages/Home.tsx';
 
-function TaskForm({ onAddTask, user_id, selectedCategory }) {
+function TaskForm({ onAddTask, user_id, selectedCategory,toggleAddTaskSidebar }) {
   // static contextType = UserContext;
   const [taskData, setTaskData] = useState({
     title: '',
@@ -26,6 +27,7 @@ const handleSubmit = async (e) => {
           .from('category')
           .select('category_id')
           .eq('category_name', selectedCategory)
+          .eq('user_id', user_id)
           .single();
 
         if (categoryError) {
@@ -47,6 +49,8 @@ const handleSubmit = async (e) => {
 
         // Clear form fields after task is successfully added
         setTaskData({ title: '', description: '', dueDate: '' });
+        toggleAddTaskSidebar();
+        window.alert("Task successfully added!");
       } catch (error) {
         console.error('Error adding task:', error.message);
       }
@@ -56,6 +60,7 @@ const handleSubmit = async (e) => {
   };
 
   return (
+    
     <form className="task-form" onSubmit={handleSubmit}>
       <label htmlFor="title">Title:</label>
       <input
@@ -84,7 +89,10 @@ const handleSubmit = async (e) => {
         onChange={handleChange}
         required
       />
-      <button type="submit">Save</button>
+      <button type="submit" >Save</button>
+      {/* <button onClick={() => {
+                    this.setState({ showAddTaskSidebar: false });
+                  }}>Save</button> */}
     </form>
   );
 }

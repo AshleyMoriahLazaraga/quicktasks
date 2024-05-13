@@ -235,11 +235,22 @@ class Home extends Component<{}, State> {
           ) : (
             <h1 className="pageTitle">Select a category</h1>
           )}
-          {showAddTaskSidebar && <AddTaskSidebar onClose={this.toggleAddTaskSidebar} />}
           <div>
             <button onClick={this.toggleAddTaskSidebar}>+ Add Task</button>
+            {showAddTaskSidebar && (
+              <aside style={{ backgroundColor: '#202124', color: '#B8DBD9' }}className="taskbar">
+            
+              <TaskForm 
+                onAddTask={this.handleAddTask} 
+                user_id={user.user_id} 
+                selectedCategory={selectedCategory} 
+                toggleAddTaskSidebar={this.toggleAddTaskSidebar} 
+              />
+  
+              </aside>
+            )}
           </div>
-            <aside style={{ backgroundColor: '#202124', color: '#B8DBD9' }}className="taskbar">
+            {/* <aside style={{ backgroundColor: '#202124', color: '#B8DBD9' }}className="taskbar">
             
             <TaskForm 
               onAddTask={this.handleAddTask} 
@@ -247,7 +258,7 @@ class Home extends Component<{}, State> {
               selectedCategory={selectedCategory} 
             />
 
-            </aside>
+            </aside> */}
 
           <aside style={{ backgroundColor: '#202124', color: '#B8DBD9' }}className="sidebar">
             <img src="src\images\logo_dark.png" alt="Logo" />
