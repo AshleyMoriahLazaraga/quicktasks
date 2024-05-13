@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import supabase from '../supabaseClient';
+import { UserContext } from '../contexts/UserContext';
 
 function TaskForm({ onAddTask, user_id, selectedCategory }) {
+  // static contextType = UserContext;
   const [taskData, setTaskData] = useState({
     title: '',
     description: '',
@@ -13,17 +15,29 @@ function TaskForm({ onAddTask, user_id, selectedCategory }) {
     setTaskData({ ...taskData, [name]: value });
   };
 
-  const handleSubmit = async (e) => {
+const handleSubmit = async (e) => { 
     e.preventDefault();
     const { title, description, dueDate } = taskData;
 
     if (title.trim() && dueDate.trim()) {
       try {
         // Call the onAddTask function to save the task to the Supabase database
+        const { data: categoryData, error: categoryError } = await supabase
+          .from('category')
+          .select('category_id')
+          .eq('category_name', selectedCategory)
+          .single();
+
+        if (categoryError) {
+          console.error('Error fetching category:', categoryError.message);
+        }
+
+        let categoryid = categoryData?.category_id;
+
         await supabase.from('task').insert([
           { 
             user_id: user_id,  // Include user_id
-            category_id: selectedCategory,  // Include category_id
+            category_id: categoryid,  // Include category_id
             title: title, 
             description: description, 
             // dueDate: dueDate,

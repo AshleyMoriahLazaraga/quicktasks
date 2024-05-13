@@ -221,6 +221,7 @@ class Home extends Component<{}, State> {
     }
   };
   
+  //////////////////////
 
   render() {
     const { showAddCategoryInput, newCategoryName, categoryNames, selectedCategory, anchorEl, showAddTaskSidebar } = this.state;
@@ -239,6 +240,7 @@ class Home extends Component<{}, State> {
             <button onClick={this.toggleAddTaskSidebar}>+ Add Task</button>
           </div>
             <aside style={{ backgroundColor: '#202124', color: '#B8DBD9' }}className="taskbar">
+            
             <TaskForm 
               onAddTask={this.handleAddTask} 
               user_id={user.user_id} 
