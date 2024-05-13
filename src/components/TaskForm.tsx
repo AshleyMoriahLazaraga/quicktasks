@@ -1,27 +1,69 @@
 import React, { useState } from 'react';
+import supabase from '../supabaseClient';
 
 function TaskForm({ onAddTask, currentCategory }) {
-  const [newTaskText, setNewTaskText] = useState('');
+  const [taskData, setTaskData] = useState({
+    title: '',
+    description: '',
+    dueDate: '',
+  });
 
-  const handleSubmit = (e) => {
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setTaskData({ ...taskData, [name]: value });
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (newTaskText.trim()) {
-      onAddTask(currentCategory, { id: Date.now(), text: newTaskText }); // Generate unique ID
-      setNewTaskText('');
+    const { title, description, dueDate } = taskData;
+
+    if (title.trim() && dueDate.trim()) {
+      try {
+        // Call the onAddTask function to save the task to the Supabase database
+        await supabase.from('task').insert([
+          { title: title, description: description, dueDate: dueDate },
+        ]);
+
+        // Clear form fields after task is successfully added
+        setTaskData({ title: '', description: '', dueDate: '' });
+      } catch (error) {
+        console.error('Error adding task:', error.message);
+      }
+    } else {
+      alert('Please enter a title and due date for the task.');
     }
   };
 
   return (
     <form className="task-form" onSubmit={handleSubmit}>
-      <label htmlFor="new-task">Add Task:</label>
+      <label htmlFor="title">Title:</label>
       <input
         type="text"
-        id="new-task"
-        value={newTaskText}
-        onChange={(e) => setNewTaskText(e.target.value)}
-        placeholder="Enter task"
+        id="title"
+        name="title"
+        value={taskData.title}
+        onChange={handleChange}
+        placeholder="Enter task title"
+        required
       />
-      <button type="submit">Add</button>
+      <label htmlFor="description">Description:</label>
+      <textarea
+        id="description"
+        name="description"
+        value={taskData.description}
+        onChange={handleChange}
+        placeholder="Enter task description"
+      />
+      <label htmlFor="dueDate">Due Date:</label>
+      <input
+        type="date"
+        id="dueDate"
+        name="dueDate"
+        value={taskData.dueDate}
+        onChange={handleChange}
+        required
+      />
+      <button type="submit">Save</button>
     </form>
   );
 }

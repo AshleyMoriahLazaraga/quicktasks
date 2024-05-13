@@ -21,6 +21,18 @@
   bottom: 0;
 }
 
+.taskbar {
+  width: 500px;
+  padding: 20px;
+  background-color: #202124;
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  border-top-left-radius: 30px;
+  border-bottom-left-radius: 30px;
+}
+
 .nav {
   display: flex;
   flex-direction: column;

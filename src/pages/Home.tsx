@@ -8,7 +8,8 @@ import MenuItem from '@mui/material/MenuItem';
 import IconButton from '@mui/material/IconButton';
 import '../Home.css';
 import { MoreVert } from '@mui/icons-material';
-
+import AddTaskSidebar from '../components/AddTaskSideBar.tsx';
+import TaskForm from '../components/TaskForm.tsx';
 
 interface State {
   tasks: { [key: string]: string[] };
@@ -17,6 +18,7 @@ interface State {
   categoryNames: string[];
   selectedCategory: string | null; // Track the selected category
   anchorEl: HTMLElement | null;
+  showAddTaskSidebar: boolean;
 }
 
 class Home extends Component<{}, State> {
@@ -31,6 +33,7 @@ class Home extends Component<{}, State> {
       categoryNames: [],
       selectedCategory: null,
       anchorEl: null, // Initialize selected category to null
+      showAddTaskSidebar: false
     };
   }
 
@@ -128,7 +131,7 @@ class Home extends Component<{}, State> {
     console.log('Delete category:', category);
     this.setState({ anchorEl: null });
   };
-  
+  //doesnt work. work in progress
   handleEditCategory = async (newCategoryName) => {
     const { selectedCategory, categoryNames } = this.state;
     const { user } = this.context;
@@ -185,8 +188,33 @@ class Home extends Component<{}, State> {
   handleMenuClose = () => {
     this.setState({ anchorEl: null });
   };
+
+  toggleAddTaskSidebar = () => {
+    this.setState((prevState) => ({
+      showAddTaskSidebar: !prevState.showAddTaskSidebar,
+    }));
+  };
+
+  handleAddTask = async (newTaskData) => {
+    const { selectedCategory } = this.state;
+    if (selectedCategory) {
+      try {
+        // Add the task to the Supabase database
+        await supabase.from('task').insert([{ ...newTaskData, category: selectedCategory }]);
+        
+        // You might also want to fetch the tasks again after adding a new one
+        // to ensure the UI is updated with the latest data
+        // Call the fetchTasks function or any function to update tasks
+      } catch (error) {
+        console.error('Error adding task:', error.message);
+      }
+    } else {
+      console.error('No category selected for the task.');
+    }
+  };
+
   render() {
-    const { showAddCategoryInput, newCategoryName, categoryNames, selectedCategory, anchorEl } = this.state;
+    const { showAddCategoryInput, newCategoryName, categoryNames, selectedCategory, anchorEl, showAddTaskSidebar } = this.state;
     const { user } = this.context;
 
     return (
@@ -197,6 +225,14 @@ class Home extends Component<{}, State> {
           ) : (
             <h1 className="pageTitle">Select a category</h1>
           )}
+          {showAddTaskSidebar && <AddTaskSidebar onClose={this.toggleAddTaskSidebar} />}
+          <div>
+            <button onClick={this.toggleAddTaskSidebar}>+ Add Task</button>
+          </div>
+            <aside style={{ backgroundColor: '#202124', color: '#B8DBD9' }}className="taskbar">
+            <TaskForm onAddTask={this.handleAddTask} currentCategory={undefined} />
+            </aside>
+
           <aside style={{ backgroundColor: '#202124', color: '#B8DBD9' }}className="sidebar">
             <img src="src\images\logo_dark.png" alt="Logo" />
             {user && (
@@ -211,7 +247,7 @@ class Home extends Component<{}, State> {
                     {category}
                   </div>
                   <IconButton aria-label="more" aria-controls="long-menu" aria-haspopup="true" onClick={(event) => this.handleMenuOpen(event, category)}>
-                    <MoreVertIcon />
+                    <MoreVert />
                   </IconButton>
                   <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={this.handleMenuClose}                  >
                     <MenuItem onClick={() => this.confirmDeleteCategory(selectedCategory)}>Delete</MenuItem>
