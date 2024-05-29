@@ -30,6 +30,7 @@ interface Task {
   dueDate: string;
   user_id: string;
   category_id: string;
+  completed: boolean;
 }
 
 class Home extends Component<{}, State> {
@@ -299,7 +300,9 @@ class Home extends Component<{}, State> {
       console.error('No category selected for the task.');
     }
   };
-  
+  setTasks = (updatedTasks) => {
+    this.setState({ tasks: updatedTasks });
+  };
   render() {
     const { showAddCategoryInput, newCategoryName, categoryNames, selectedCategory, anchorEl, showAddTaskSidebar, tasks } = this.state;
     const { user } = this.context;
@@ -381,7 +384,7 @@ class Home extends Component<{}, State> {
             <TaskList 
               selectedCategory={selectedCategory} 
               tasks={tasks} 
-              //setTasks={this.setState.bind(this, { tasks })} 
+              setTasks={this.setTasks}
             />
           )}
           
