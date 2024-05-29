@@ -4,11 +4,15 @@
 
 .pageTitle {
   margin-top: 20px;
-  margin-left: 240px; /* Adjust according to sidebar width */
+  margin-left: 260px; /* Adjust according to sidebar width */
   color: #586F7C;
   font-size: 40px;
-  padding: 20px;
+  /* padding: 20px; */
   vertical-align: top;
+  text-align: right;
+  width: 100%;
+  height: 100%;
+  display: flex;
 }
 
 .sidebar {
@@ -22,7 +26,7 @@
 }
 
 .taskbar {
-  width: 500px;
+  width: 260px;
   padding: 20px;
   background-color: #202124;
   position: fixed;
@@ -60,4 +64,18 @@
 
 .categoryRow.active {
   font-weight: bold;
+}
+
+.homePage {
+  text-align: left;
+  margin-left: 250px;
+  padding: 10px;
+}
+
+.notComplete {
+  padding: 10px;
+}
+
+.complete {
+  padding: 10px;
 }
