@@ -1,0 +1,15 @@
+.floating-button-container {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 1000; /* Ensure the FAB is above other elements */
+}
+
+.floating-button {
+  /* Add any additional styles you want for your FAB */
+}
+
+.icon {
+  color: #202124;
+  size: 100px;
+}

@@ -1,0 +1,43 @@
+/* src/components/CategoryList.css */
+
+.list-item-button-open {
+  /* min-height: 48px; */
+  justify-content: initial;
+  padding: 0, 0, 0, 0;
+  margin: 0, 0, 0, 0;
+  background-color: #202124;
+  color: #B8DBD9;
+  font-family: 'Tahoma';
+  font-size: xx-large;
+}
+
+.list-item-icon-open {
+  min-width: auto;
+  margin-right: 0rem;
+  justify-content: center;
+  padding-right: 0rem;
+}
+
+
+.list-item-text-open {
+  opacity: 1;
+  padding-left: 1.5rem;
+}
+
+.icon {
+  color: #B8DBD9;
+}
+
+.css-cveggr-MuiListItemIcon-root {
+  /* min-width: 56px; */
+  color: rgba(0, 0, 0, 0.54);
+  -webkit-flex-shrink: 0;
+  -ms-flex-negative: 0;
+  flex-shrink: 0;
+  display: -webkit-inline-box;
+  display: -webkit-inline-flex;
+  display: -ms-inline-flexbox;
+  display: inline-flex;
+}
+
+
