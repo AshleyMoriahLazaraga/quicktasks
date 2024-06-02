@@ -41,7 +41,8 @@ const TaskList = forwardRef<{ fetchTasks: () => void }, TaskListProps>(({ onTask
         .from('task')
         .select('*')
         .eq('user_id', user.user_id)
-        .eq('category_id', category_id);
+        .eq('category_id', category_id)
+        .order('created_at', { ascending: false });
 
       if (error) {
         console.error('Error fetching tasks:', error);
