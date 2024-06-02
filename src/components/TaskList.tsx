@@ -4,6 +4,13 @@ import { useEffect, useState, useImperativeHandle, forwardRef } from 'react';
 import { useParams } from 'react-router-dom';
 import { useUser } from '../contexts/UserContext';
 import supabase from '../supabaseClient';
+import * as React from 'react';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogTitle from '@mui/material/DialogTitle';
+import TextField from '@mui/material/TextField';
+import Button from '@mui/material/Button';
 
 interface Task {
   task_id: string;
@@ -24,6 +31,8 @@ const TaskList = forwardRef<{ fetchTasks: () => void }, TaskListProps>(({ onTask
   const [tasks, setTasks] = useState<Task[]>([]);
   const { user } = useUser();
   const { category_id } = useParams();
+  const [open, setOpen] = useState(false);
+  const [selectedTask, setSelectedTask] = useState<Task | null>(null);
 
   const fetchTasks = async () => {
     if (user) {
@@ -74,6 +83,43 @@ const TaskList = forwardRef<{ fetchTasks: () => void }, TaskListProps>(({ onTask
     }
   };
 
+  const handleClickOpen = (task: Task) => {
+    setSelectedTask(task);
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+    setSelectedTask(null);
+  };
+
+  const handleTaskChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    if (selectedTask) {
+      setSelectedTask({ ...selectedTask, [name]: value });
+    }
+  };
+
+  const handleSaveChanges = async () => {
+    if (selectedTask) {
+      try {
+        await supabase
+          .from('task')
+          .update({
+            title: selectedTask.title,
+            description: selectedTask.description,
+            dueDate: selectedTask.dueDate,
+          })
+          .eq('task_id', selectedTask.task_id);
+
+        setTasks(tasks.map(t => (t.task_id === selectedTask.task_id ? selectedTask : t)));
+        handleClose();
+      } catch (error) {
+        console.error('Error updating task:', error.message);
+      }
+    }
+  };
+
   return (
     <Box
       sx={{
@@ -89,10 +135,14 @@ const TaskList = forwardRef<{ fetchTasks: () => void }, TaskListProps>(({ onTask
     >
       <List sx={{ width: '100%', height: '100%' }}>
         {tasks.map((task) => (
-          <ListItem key={task.task_id} sx={{ border: '1px solid #ccc', borderRadius: '10px', marginBottom: 1, marginLeft: '0px', paddingLeft: '0px', justifyContent: 'space-evenly' }} disablePadding>
-            <ListItemButton onClick={() => handleTaskCompletionToggle(task)}>
+          <ListItem
+            key={task.task_id}
+            sx={{ border: '1px solid #ccc', borderRadius: '10px', marginBottom: 1, paddingLeft: '0px', justifyContent: 'space-evenly' }}
+            disablePadding
+          >
+            <ListItemButton onClick={() => handleClickOpen(task)}>
               <ListItemIcon sx={{ color: '#B8DBD9', minWidth: 'auto' }}>
-                {task.completed ? <CheckBox /> : <CheckBoxOutlineBlank />}
+                {task.completed ? <CheckBox /> : <CheckBoxOutlineBlank sx={{ width: '20px' }} />}
               </ListItemIcon>
             </ListItemButton>
             <ListItemText
@@ -110,6 +160,50 @@ const TaskList = forwardRef<{ fetchTasks: () => void }, TaskListProps>(({ onTask
           </ListItem>
         ))}
       </List>
+
+      <Dialog open={open} onClose={handleClose}>
+        <DialogTitle>Edit Task</DialogTitle>
+        <DialogContent>
+          <TextField
+            autoFocus
+            margin="dense"
+            label="Title"
+            type="text"
+            fullWidth
+            variant="standard"
+            name="title"
+            value={selectedTask?.title || ''}
+            onChange={handleTaskChange}
+          />
+          <TextField
+            margin="dense"
+            label="Description"
+            type="text"
+            fullWidth
+            variant="standard"
+            name="description"
+            value={selectedTask?.description || ''}
+            onChange={handleTaskChange}
+          />
+          <TextField
+            margin="dense"
+            label="Due Date"
+            type="date"
+            fullWidth
+            variant="standard"
+            name="dueDate"
+            value={selectedTask?.dueDate ? new Date(selectedTask.dueDate).toISOString().substring(0, 10) : ''}
+            onChange={handleTaskChange}
+            InputLabelProps={{
+              shrink: true,
+            }}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleClose}>Cancel</Button>
+          <Button onClick={handleSaveChanges}>Save</Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 });
