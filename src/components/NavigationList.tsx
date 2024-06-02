@@ -2,6 +2,7 @@ import { List, ListItem, ListItemButton, ListItemIcon, ListItemText } from '@mui
 import { IoSettingsOutline } from "react-icons/io5";
 import { MdTaskAlt } from 'react-icons/md';
 import { useNavigate } from 'react-router-dom';
+import LogoutIcon from '@mui/icons-material/Logout';
 import '../CSS files/SideBar.css';
 
 function NavigationList() {
@@ -12,8 +13,8 @@ function NavigationList() {
       case 'Tasks':
         navigate('/home/tasks');
         break;
-      case 'Settings':
-        navigate('/home/settings');
+      case 'Logout':
+        navigate('/login');
         break;
       default:
         break;
@@ -22,7 +23,7 @@ function NavigationList() {
 
   return (
     <List>
-      {['Tasks', 'Settings'].map((text, index) => (
+      {['Tasks', 'Logout'].map((text, index) => (
         <ListItem key={text} disablePadding onClick={() => handleNavigation(text)}>
           <ListItemButton sx={{
             color: '#B8DBD9',
@@ -38,7 +39,7 @@ function NavigationList() {
             }
           }}>
             <ListItemIcon sx={{ '&:hover': { backgroundColor: '#B8DBD9' } }}>
-              {index === 0 ? <MdTaskAlt className="icon" /> : <IoSettingsOutline className="icon" />}
+              {index === 0 ? <MdTaskAlt className="icon" /> : <LogoutIcon className="icon" />}
             </ListItemIcon>
             <ListItemText primary={text} />
           </ListItemButton>
