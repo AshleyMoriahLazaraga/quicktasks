@@ -1,113 +1,117 @@
-import * as React from 'react';
-import List from '@mui/material/List';
-import ListItem from '@mui/material/ListItem';
-import ListItemButton from '@mui/material/ListItemButton';
-import ListItemText from '@mui/material/ListItemText';
-import ListItemAvatar from '@mui/material/ListItemAvatar';
-import Checkbox from '@mui/material/Checkbox';
-import Avatar from '@mui/material/Avatar';
-import Button from '@mui/material/Button';
+import { CheckBox, CheckBoxOutlineBlank } from '@mui/icons-material';
+import { Box, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Typography } from '@mui/material';
+import { useEffect, useState, useImperativeHandle, forwardRef } from 'react';
+import { useParams } from 'react-router-dom';
+import { useUser } from '../contexts/UserContext';
 import supabase from '../supabaseClient';
 
-export default function TaskList({ selectedCategory, tasks, setTasks }: { selectedCategory: string, tasks: any[], setTasks: (tasks: any[]) => void }) {
-  const [checked, setChecked] = React.useState<number[]>([]);
-  const [sortedTasks, setSortedTasks] = React.useState(tasks);
+interface Task {
+  task_id: string;
+  user_id: string;
+  category_id: string;
+  title: string;
+  description: string;
+  dueDate: Date;
+  completed: boolean;
+}
 
-  React.useEffect(() => {
-    setSortedTasks(tasks);
-  }, [tasks]);
+interface TaskListProps {
+  onTasksUpdated?: () => void;
+  setLoading: (loading: boolean) => void; // Pass setLoading function as prop
+}
 
-  const handleToggle = async (task) => {
-    const currentIndex = checked.indexOf(task.task_id);
-    const newChecked = [...checked];
+const TaskList = forwardRef<{ fetchTasks: () => void }, TaskListProps>(({ onTasksUpdated, setLoading }, ref) => {
+  const [tasks, setTasks] = useState<Task[]>([]);
+  const { user } = useUser();
+  const { category_id } = useParams();
 
-    if (currentIndex === -1) {
-      newChecked.push(task.task_id);
-    } else {
-      newChecked.splice(currentIndex, 1);
-    }
+  const fetchTasks = async () => {
+    if (user) {
+      setLoading(true); // Set loading to true
+      const { data, error } = await supabase
+        .from('task')
+        .select('*')
+        .eq('user_id', user.user_id)
+        .eq('category_id', category_id);
 
-    setChecked(newChecked);
-
-    // Update the task completion status in the database
-    const { error } = await supabase
-      .from('task')
-      .update({ completed: !task.completed })
-      .eq('task_id', task.task_id);
-
-    if (error) {
-      console.error('Error updating task:', error.message);
-    } else {
-      // Update the task list state to reflect the change
-      setTasks((prevTasks) =>
-        prevTasks.map((t) =>
-          t.task_id === task.task_id ? { ...t, completed: !task.completed } : t
-        )
-      );
+      if (error) {
+        console.error('Error fetching tasks:', error);
+      } else {
+        setTasks(data || []);
+        if (onTasksUpdated) {
+          onTasksUpdated();
+        }
+      }
+      setLoading(false); // Set loading to false after tasks are fetched
     }
   };
 
-  const formatDate = (dateString) => {
-    const options = { day: '2-digit', month: 'short', year: 'numeric' };
-    return new Date(dateString).toLocaleDateString('en-GB', options);
-  };
+  useImperativeHandle(ref, () => ({
+    fetchTasks
+  }));
 
-  // React.useEffect(() => {
-  //   // Sort the tasks so that completed tasks are at the bottom
-  //   const sorted = [...tasks].sort((a, b) => {
-  //     if (a.completed === b.completed) {
-  //       return new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime();
-  //     }
-  //     return a.completed ? 1 : -1;
-  //   });
-  //   setSortedTasks(sorted);
-  // }, [tasks]);
+  useEffect(() => {
+    fetchTasks();
+  }, [category_id, user]);
 
-  const sortTasksByDeadline = () => {
-    const sorted = [...sortedTasks].sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate));
-    setSortedTasks(sorted);
+  const handleTaskCompletionToggle = async (task: Task) => {
+    try {
+      const updatedTasks = tasks.map(t => {
+        if (t.task_id === task.task_id) {
+          return { ...t, completed: !t.completed };
+        } else {
+          return t;
+        }
+      });
+      setTasks(updatedTasks);
+
+      await supabase
+        .from('task')
+        .update({ completed: !task.completed })
+        .eq('task_id', task.task_id);
+    } catch (error) {
+      console.error('Error toggling task completion:', error.message);
+    }
   };
 
   return (
-    <div style={{ marginLeft: '260px', height: '600px', overflowY: 'auto' }}>
-      <button onClick={sortTasksByDeadline} variant="contained" color="primary">Sort by Closest Deadlines</button>
-      <List dense sx={{ width: '100%', maxWidth: 360, bgcolor: 'background.paper' }}>
-        {sortedTasks.map((task, index) => {
-          const labelId = `checkbox-list-secondary-label-${task.task_id}`;
-          return (
-            <ListItem
-              key={task.task_id}
-              secondaryAction={
-                <Checkbox
-                  edge="end"
-                  onChange={() => handleToggle(task)}
-                  checked={task.completed}
-                  inputProps={{ 'aria-labelledby': labelId }}
-                />
+    <Box
+      sx={{
+        display: 'flex',
+        justifyContent: 'left',
+        alignItems: 'center',
+        height: '80vh',
+        flexGrow: 1,
+        overflow: 'auto',
+        marginTop: '50px',
+        width: '100%',
+      }}
+    >
+      <List sx={{ width: '100%', height: '100%' }}>
+        {tasks.map((task) => (
+          <ListItem key={task.task_id} sx={{ border: '1px solid #ccc', borderRadius: '10px', marginBottom: 1, marginLeft: '0px', paddingLeft: '0px', justifyContent: 'space-evenly' }} disablePadding>
+            <ListItemButton onClick={() => handleTaskCompletionToggle(task)}>
+              <ListItemIcon sx={{ color: '#B8DBD9', minWidth: 'auto' }}>
+                {task.completed ? <CheckBox /> : <CheckBoxOutlineBlank />}
+              </ListItemIcon>
+            </ListItemButton>
+            <ListItemText
+              primary={
+                <Typography variant="h6" component="div" sx={{ textAlign: 'left' }}>
+                  {task.title}
+                </Typography>
               }
-              disablePadding
-            >
-              <ListItemButton>
-                <ListItemAvatar>
-                  <Avatar
-                    sx={{
-                      backgroundColor: 'transparent',
-                      boxShadow: 'none',
-                    }}
-                  >
-                    {index % 2 === 0 ? '✅' : '📝'} {/* Example emojis */}
-                  </Avatar>
-                </ListItemAvatar>
-                <ListItemText
-                  id={labelId}
-                  primary={task.title}
-                  secondary={`${task.description} - ${formatDate(task.dueDate)}`}
-                />
-              </ListItemButton>
-            </ListItem>
-          );
-        })}
+              secondary={
+                <Typography variant="body2" color="#B8DBD9" sx={{ textAlign: 'left' }}>
+                  {task.description}
+                </Typography>
+              }
+            />
+          </ListItem>
+        ))}
       </List>
-    </div>
+    </Box>
   );
-}
+});
+
+export default TaskList;

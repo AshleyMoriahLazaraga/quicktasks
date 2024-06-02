@@ -1,0 +1,41 @@
+/* SideBar.css */
+
+.drawer-paper {
+  width: 240px;
+  box-sizing: border-box;
+  background-color: #202124;
+  color: #B8DBD9;
+  border-block-color: #fff;
+}
+
+.logo-container {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.logo {
+  width: 100px;
+  height: auto;
+}
+
+.divider {
+  background-color: #fff;
+}
+
+.icon {
+  color: #fff;
+}
+
+.body {
+  font-family: 'Tahoma';
+}
+
+.list-item-button:hover {
+  background-color: whitesmoke; /* Change this to your desired hover color */
+}
+
+.box {
+  margin-left: 50px;
+}

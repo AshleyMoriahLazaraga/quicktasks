@@ -41,3 +41,14 @@
   color: #888;
 }
 
+.css-cveggr-MuiListItemIcon-root {
+  min-width: auto;
+  -webkit-flex-shrink: 0;
+  -ms-flex-negative: 0;
+  flex-shrink: 0;
+  display: -webkit-inline-box;
+  display: -webkit-inline-flex;
+  display: -ms-inline-flexbox;
+  display: inline-flex;
+}
+
