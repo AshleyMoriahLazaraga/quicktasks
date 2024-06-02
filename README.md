@@ -1,8 +1,11 @@
-# React + Vite
+# QuickTasks (React + TypeScript + Supabase)
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+QuickTasks is a task management system built with React and TypeScript. It uses Supabase for backend services and Material UI for the user interface.
 
-Currently, two official plugins are available:
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+### Features Summary:
+- Task Management: Easily create and organize tasks.
+- Minimalist Interface: Clean and intuitive design for focused task management.
+- Due Dates: Set due dates to stay on track and meet deadlines.
+- Task Completion: Mark tasks as complete with simple gestures.
+- Categorization: Categorize tasks into lists or projects for better organization.
