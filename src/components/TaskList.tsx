@@ -140,23 +140,25 @@ const TaskList = forwardRef<{ fetchTasks: () => void }, TaskListProps>(({ onTask
             sx={{ border: '1px solid #ccc', borderRadius: '10px', marginBottom: 1, paddingLeft: '0px', justifyContent: 'space-evenly' }}
             disablePadding
           >
-            <ListItemButton onClick={() => handleClickOpen(task)}>
+            <ListItemButton onClick={() => handleTaskCompletionToggle(task)} >
               <ListItemIcon sx={{ color: '#B8DBD9', minWidth: 'auto' }}>
                 {task.completed ? <CheckBox /> : <CheckBoxOutlineBlank sx={{ width: '20px' }} />}
               </ListItemIcon>
             </ListItemButton>
-            <ListItemText
-              primary={
-                <Typography variant="h6" component="div" sx={{ textAlign: 'left' }}>
-                  {task.title}
-                </Typography>
-              }
-              secondary={
-                <Typography variant="body2" color="#B8DBD9" sx={{ textAlign: 'left' }}>
-                  {task.description}
-                </Typography>
-              }
-            />
+            <ListItemButton onClick={() => handleClickOpen(task)} sx={{ flexGrow: 1 }}>
+              <ListItemText
+                primary={
+                  <Typography variant="h6" component="div" sx={{ textAlign: 'left' }}>
+                    {task.title}
+                  </Typography>
+                }
+                secondary={
+                  <Typography variant="body2" color="#B8DBD9" sx={{ textAlign: 'left' }}>
+                    {task.description}
+                  </Typography>
+                }
+              />
+            </ListItemButton>
           </ListItem>
         ))}
       </List>
