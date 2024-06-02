@@ -1,6 +1,6 @@
 import { CheckBox, CheckBoxOutlineBlank } from '@mui/icons-material';
 import { Box, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Typography } from '@mui/material';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useImperativeHandle, forwardRef } from 'react';
 import { useParams } from 'react-router-dom';
 import { useUser } from '../contexts/UserContext';
 import supabase from '../supabaseClient';
@@ -15,30 +15,42 @@ interface Task {
   completed: boolean;
 }
 
-interface TaskListProps {}
+interface TaskListProps {
+  onTasksUpdated?: () => void;
+  setLoading: (loading: boolean) => void; // Pass setLoading function as prop
+}
 
-const TaskList: React.FC<TaskListProps> = () => {
+const TaskList = forwardRef<{ fetchTasks: () => void }, TaskListProps>(({ onTasksUpdated, setLoading }, ref) => {
   const [tasks, setTasks] = useState<Task[]>([]);
   const { user } = useUser();
   const { category_id } = useParams();
 
-  useEffect(() => {
-    const fetchTasks = async () => {
-      if (user) {
-        const { data, error } = await supabase
-          .from('task')
-          .select('*')
-          .eq('user_id', user.user_id)
-          .eq('category_id', category_id);
+  const fetchTasks = async () => {
+    if (user) {
+      setLoading(true); // Set loading to true
+      const { data, error } = await supabase
+        .from('task')
+        .select('*')
+        .eq('user_id', user.user_id)
+        .eq('category_id', category_id);
 
-        if (error) {
-          console.error('Error fetching tasks:', error);
-        } else {
-          setTasks(data || []);
+      if (error) {
+        console.error('Error fetching tasks:', error);
+      } else {
+        setTasks(data || []);
+        if (onTasksUpdated) {
+          onTasksUpdated();
         }
       }
-    };
+      setLoading(false); // Set loading to false after tasks are fetched
+    }
+  };
 
+  useImperativeHandle(ref, () => ({
+    fetchTasks
+  }));
+
+  useEffect(() => {
     fetchTasks();
   }, [category_id, user]);
 
@@ -46,7 +58,7 @@ const TaskList: React.FC<TaskListProps> = () => {
     try {
       const updatedTasks = tasks.map(t => {
         if (t.task_id === task.task_id) {
-          return { ...t, completed: !t.completed }; 
+          return { ...t, completed: !t.completed };
         } else {
           return t;
         }
@@ -77,8 +89,7 @@ const TaskList: React.FC<TaskListProps> = () => {
     >
       <List sx={{ width: '100%', height: '100%' }}>
         {tasks.map((task) => (
-          <ListItem key={task.task_id} sx={{ border: '1px solid #ccc', borderRadius: '10px', marginBottom: 1, marginLeft:'0px', paddingLeft: '0px', justifyContent: 'space-evenly',
-           }} disablePadding>
+          <ListItem key={task.task_id} sx={{ border: '1px solid #ccc', borderRadius: '10px', marginBottom: 1, marginLeft: '0px', paddingLeft: '0px', justifyContent: 'space-evenly' }} disablePadding>
             <ListItemButton onClick={() => handleTaskCompletionToggle(task)}>
               <ListItemIcon sx={{ color: '#B8DBD9', minWidth: 'auto' }}>
                 {task.completed ? <CheckBox /> : <CheckBoxOutlineBlank />}
@@ -101,6 +112,6 @@ const TaskList: React.FC<TaskListProps> = () => {
       </List>
     </Box>
   );
-};
+});
 
 export default TaskList;

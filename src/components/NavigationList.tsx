@@ -2,6 +2,7 @@ import { List, ListItem, ListItemButton, ListItemIcon, ListItemText } from '@mui
 import { IoSettingsOutline } from "react-icons/io5";
 import { MdTaskAlt } from 'react-icons/md';
 import { useNavigate } from 'react-router-dom';
+import '../CSS files/SideBar.css';
 
 function NavigationList() {
   const navigate = useNavigate();
@@ -25,6 +26,9 @@ function NavigationList() {
         <ListItem key={text} disablePadding onClick={() => handleNavigation(text)}>
           <ListItemButton sx={{
             color: '#B8DBD9',
+            '& .icon': {
+              color: '#B8DBD9',
+            },
             '&:hover': {
               backgroundColor: '#B8DBD9',
               color: '#202124',

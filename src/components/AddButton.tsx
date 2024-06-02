@@ -1,10 +1,18 @@
 import React, { useState } from 'react';
-import { Fab, Dialog, List, ListItem, ListItemText, ListItemButton } from "@mui/material";
+import { Fab, Dialog, List, ListItemText, ListItemButton } from "@mui/material";
 import { MdAdd } from "react-icons/md";
+import AddTaskDialog from './AddTaskDialog';
+import AddCategoryDialog from './AddCategoryDialog'; // Import AddCategoryDialog
 import '../CSS files/AddButton.css';
 
-function AddButton() {
+interface AddButtonProps {
+  onTaskAdded: () => void; // callback to trigger after task is added
+}
+
+const AddButton: React.FC<AddButtonProps> = ({ onTaskAdded }) => {
   const [openDialog, setOpenDialog] = useState(false);
+  const [openTaskDialog, setOpenTaskDialog] = useState(false);
+  const [openCategoryDialog, setOpenCategoryDialog] = useState(false); // State for AddCategoryDialog
 
   const handleDialogOpen = () => {
     setOpenDialog(true);
@@ -12,6 +20,25 @@ function AddButton() {
 
   const handleDialogClose = () => {
     setOpenDialog(false);
+  };
+
+  const handleTaskDialogOpen = () => {
+    setOpenTaskDialog(true);
+    setOpenDialog(false);
+  };
+
+  const handleCategoryDialogOpen = () => {
+    setOpenCategoryDialog(true); // Open AddCategoryDialog
+    setOpenDialog(false); // Close main dialog
+  };
+
+  const handleTaskDialogClose = () => {
+    setOpenTaskDialog(false);
+    onTaskAdded(); // Call the callback after the task dialog is closed
+  };
+
+  const handleCategoryDialogClose = () => {
+    setOpenCategoryDialog(false); // Close AddCategoryDialog
   };
 
   return (
@@ -35,14 +62,22 @@ function AddButton() {
         aria-labelledby="dialog-title"
       >
         <List>
-          <ListItemButton>
+          <ListItemButton onClick={handleTaskDialogOpen}>
             <ListItemText primary="Task" />
           </ListItemButton>
-          <ListItemButton>
+          <ListItemButton onClick={handleCategoryDialogOpen}> {/* Trigger AddCategoryDialog */}
             <ListItemText primary="Category" />
           </ListItemButton>
         </List>
       </Dialog>
+      <AddTaskDialog
+        open={openTaskDialog}
+        onClose={handleTaskDialogClose}
+      />
+      <AddCategoryDialog 
+        open={openCategoryDialog}
+        onClose={handleCategoryDialogClose}
+      />
     </div>
   );
 }

@@ -1,10 +1,11 @@
-import { Typography } from "@mui/material";
+import { Stack, Typography } from "@mui/material";
 
 function SettingsPage() {
   return(
-    <div>
+    <Stack>
       <Typography variant="h2">Settings Page</Typography>
-    </div>
+
+    </Stack>
   );
 }
 

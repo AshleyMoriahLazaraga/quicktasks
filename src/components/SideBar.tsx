@@ -4,11 +4,21 @@ import { useUser } from '../contexts/UserContext';
 import logoDark from '../images/logo_dark.png';
 import CategoryList from './CategoryList';
 import NavigationList from './NavigationList';
+import { useRef, useState } from 'react';
+import AddCategoryButton from './AddCategoryButton';
 
 const drawerWidth = 240;
 
 function SideBar() {
   const { user } = useUser();
+  const [loading, setLoading] = useState(true);
+  const categoryListRef = useRef<{ fetchCategories: () => void }>(null);
+
+  const handleCategoryUpdated = () => {
+    if (categoryListRef.current) {
+      categoryListRef.current.fetchCategories();
+    }
+  };
 
   return (
     <Box sx={{ display: 'flex' }}>
@@ -36,10 +46,13 @@ function SideBar() {
         </Toolbar>
         <Divider className="divider" />
         <NavigationList />
-        <Divider className="divider" />
+        <Divider className="divider" sx={{marginBottom: '10px'}} />
+
+        <AddCategoryButton onCategoryAdded={handleCategoryUpdated} />
+
         <Typography sx={{ marginBottom: '10px', marginTop: '10px', color: '#B8DBD9' }}> Categories </Typography>
         <Box sx={{ flexGrow: 1, overflow: 'auto' }}>
-          <CategoryList />
+          <CategoryList ref={categoryListRef} onCategoryUpdated={() => setLoading(false)} setLoading={setLoading}/>
         </Box>
       </Drawer>
     </Box>

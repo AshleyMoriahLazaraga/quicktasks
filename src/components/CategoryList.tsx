@@ -1,7 +1,7 @@
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { List, ListItem, ListItemButton, ListItemIcon, ListItemText, Menu, MenuItem } from '@mui/material';
-import { useEffect, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { forwardRef, useEffect, useImperativeHandle, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import '../CSS files/CategoryList.css';
 import { useUser } from '../contexts/UserContext';
 import supabase from '../supabaseClient';
@@ -12,10 +12,15 @@ interface Category {
   user_id: string;
 }
 
-const CategoryList: React.FC = () => {
+interface CategoryListProps {
+  onCategoryUpdated?: () => void;
+  setLoading: (loading: boolean) => void;
+}
+
+const CategoryList = forwardRef<{ fetchCategories: () => void }, CategoryListProps>(({ onCategoryUpdated, setLoading }, ref) => {
   const [categories, setCategories] = useState<Category[]>([]);
   const { user } = useUser();
-  const {categoryId} = useParams();
+  // const {categoryId} = useParams();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const navigate = useNavigate();
 
@@ -23,28 +28,40 @@ const CategoryList: React.FC = () => {
     navigate(`/home/category/${categoryId}`);
   }
 
+  const fetchCategories = async () => {
+    if (user) {
+      setLoading(true);
+      const { data, error } = await supabase
+        .from('category')
+        .select('category_id, category_name')
+        .eq('user_id', user.user_id);
 
-  useEffect(() => {
-    const fetchCategories = async () => {
-      if (user) {
-        const { data, error } = await supabase
-          .from('category')
-          .select('category_id, category_name')
-          .eq('user_id', user.user_id);
-
-        if (error) {
-          console.error('Error fetching categories:', error);
-        } else {
-          setCategories(data || []);
+      if (error) {
+        console.error('Error fetching categories:', error);
+      } else {
+        setCategories(data || []);
+        if(onCategoryUpdated) {
+          onCategoryUpdated();
         }
       }
-    };
+      setLoading(false);
+    }
+  };
 
+  useImperativeHandle(ref, () =>({
+    fetchCategories
+  }));
+
+  useEffect(() => {
     fetchCategories();
   }, [user]);
 
+
   const handleClick = (event: React.MouseEvent<HTMLDivElement>) => {
-    setAnchorEl(event.currentTarget);
+    if (event.target instanceof SVGElement && event.target.closest('.icon')) {
+      event.stopPropagation();
+      setAnchorEl(event.currentTarget);
+    }
   };
 
   const handleClose = () => {
@@ -75,6 +92,9 @@ const CategoryList: React.FC = () => {
         <ListItem key={category.category_id} disablePadding className={'list-item-button-open'}
         onClick={() => handleNavigation(category.category_id)}>
           <ListItemButton sx={{
+            '& .icon': {
+              color: '#B8DBD9',
+            },
             '&:hover': {
               backgroundColor: '#B8DBD9',
               color: '#202124',
@@ -83,7 +103,7 @@ const CategoryList: React.FC = () => {
               },
             },
             flexGrow: 1,
-          }}>
+          }} onClick={handleClick}>
             <ListItemText primary={category.category_name} className={'list-item-text-open'}
               style={{ marginRight: '100px' }} />
             <ListItemIcon style={{ paddingRight: '0px', marginRight: '0px', minWidth: 'auto' }}>
@@ -113,6 +133,6 @@ const CategoryList: React.FC = () => {
       ))}
     </List>
   );
-};
+});
 
 export default CategoryList;

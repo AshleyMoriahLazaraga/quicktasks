@@ -1,10 +1,13 @@
-import { Typography } from "@mui/material";
+import { Stack, Typography } from "@mui/material";
+import AddButton from "../components/AddButton";
 
 function AllTasksPage() {
   return(
-    <div>
+    <Stack>
       <Typography variant="h2">All Tasks Page</Typography>
-    </div>
+
+      <AddButton />
+    </Stack>
   );
 }
 
