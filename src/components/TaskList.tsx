@@ -135,6 +135,10 @@ const TaskList = forwardRef<{ fetchTasks: () => void }, TaskListProps>(({ onTask
       }
     }
   };
+  const formatDate = (dateString) => {
+    const options = { day: '2-digit', month: 'short', year: 'numeric' };
+    return new Date(dateString).toLocaleDateString('en-GB', options);
+  };
 
   return (
     <Box
@@ -146,14 +150,15 @@ const TaskList = forwardRef<{ fetchTasks: () => void }, TaskListProps>(({ onTask
         flexGrow: 1,
         overflow: 'auto',
         marginTop: '50px',
-        width: '100%',
+        width: '80vw',
+        padding: '9px'
       }}
     >
       <List sx={{ width: '100%', height: '100%' }}>
         {tasks.map((task) => (
           <ListItem
             key={task.task_id}
-            sx={{ border: '1px solid #ccc', borderRadius: '10px', marginBottom: 1, paddingLeft: '0px', justifyContent: 'space-evenly', height: "65px" }}
+            sx={{ border: '1px solid #ccc', borderRadius: '10px', marginBottom: 1, paddingLeft: '0px', justifyContent: 'space-evenly', minHeight: "80px" }}
             disablePadding
           >
             <ListItemButton sx={{ color: '#B8DBD9', maxWidth: '40px' }} onClick={() => handleTaskCompletionToggle(task)} >
@@ -177,7 +182,10 @@ const TaskList = forwardRef<{ fetchTasks: () => void }, TaskListProps>(({ onTask
                 }
                 secondary={
                   <Typography variant="body2" color="#B8DBD9" sx={{ textAlign: 'left' }}>
-                    {task.description}
+                    {`${formatDate(task.dueDate)}`}
+                    <br></br>
+                    {`${task.description}`}
+                    
                   </Typography>
                 }
               />

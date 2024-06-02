@@ -1,4 +1,6 @@
 import { List, ListItem, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
+import { IoSettingsOutline } from "react-icons/io5";
+import { MdTaskAlt } from 'react-icons/md';
 import { useNavigate } from 'react-router-dom';
 import LogoutIcon from '@mui/icons-material/Logout';
 import '../CSS files/SideBar.css';
@@ -6,14 +8,23 @@ import '../CSS files/SideBar.css';
 function NavigationList() {
   const navigate = useNavigate();
 
-  const handleLogout = () => {
-    navigate('/login');
-  }
+  const handleNavigation = (page) => {
+    switch(page) {
+      case 'Tasks':
+        navigate('/home/tasks');
+        break;
+      case 'Logout':
+        navigate('/login');
+        break;
+      default:
+        break;
+    }
+  };
 
   return (
     <List>
-      {['Logout'].map((text, index) => (
-        <ListItem key={text} disablePadding onClick={() => handleLogout()}>
+      {['Tasks', 'Logout'].map((text, index) => (
+        <ListItem key={text} disablePadding onClick={() => handleNavigation(text)}>
           <ListItemButton sx={{
             color: '#B8DBD9',
             '& .icon': {
@@ -28,7 +39,7 @@ function NavigationList() {
             }
           }}>
             <ListItemIcon sx={{ '&:hover': { backgroundColor: '#B8DBD9' } }}>
-              <LogoutIcon className="icon" />
+              {index === 0 ? <MdTaskAlt className="icon" /> : <LogoutIcon className="icon" />}
             </ListItemIcon>
             <ListItemText primary={text} />
           </ListItemButton>
