@@ -2,6 +2,7 @@ import { List, ListItem, ListItemButton, ListItemIcon, ListItemText } from '@mui
 import { IoSettingsOutline } from "react-icons/io5";
 import { MdTaskAlt } from 'react-icons/md';
 import { useNavigate } from 'react-router-dom';
+import LogoutIcon from '@mui/icons-material/Logout';
 import '../CSS files/SideBar.css';
 
 function NavigationList() {
@@ -38,7 +39,7 @@ function NavigationList() {
             }
           }}>
             <ListItemIcon sx={{ '&:hover': { backgroundColor: '#B8DBD9' } }}>
-              {index === 0 ? <MdTaskAlt className="icon" /> : <IoSettingsOutline className="icon" />}
+              {index === 0 ? <MdTaskAlt className="icon" /> : <LogoutIcon className="icon" />}
             </ListItemIcon>
             <ListItemText primary={text} />
           </ListItemButton>
