@@ -164,7 +164,14 @@ const TaskList = forwardRef<{ fetchTasks: () => void }, TaskListProps>(({ onTask
             <ListItemButton onClick={() => handleClickOpen(task)} sx={{ flexGrow: 1 }}>
               <ListItemText
                 primary={
-                  <Typography variant="h6" component="div" sx={{ textAlign: 'left' }}>
+                  <Typography
+                    variant="h6"
+                    component="div"
+                    sx={{
+                      textAlign: 'left',
+                      textDecoration: task.completed ? 'line-through' : 'none',
+                    }}
+                  >
                     {task.title}
                   </Typography>
                 }

@@ -31,6 +31,7 @@ const Register: React.FC = () => {
       } else {
         console.log('User created:', data);
         // Reset form fields after successful submission
+        alert('Account created successfully!');
         setUsername('');
         setEmail('');
         setPassword('');
