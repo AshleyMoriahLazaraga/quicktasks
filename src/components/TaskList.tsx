@@ -120,6 +120,22 @@ const TaskList = forwardRef<{ fetchTasks: () => void }, TaskListProps>(({ onTask
     }
   };
 
+  const handleDeleteTask = async () => {
+    if (selectedTask) {
+      try {
+        await supabase
+          .from('task')
+          .delete()
+          .eq('task_id', selectedTask.task_id);
+
+        setTasks(tasks.filter(t => t.task_id !== selectedTask.task_id));
+        handleClose();
+      } catch (error) {
+        console.error('Error deleting task:', error.message);
+      }
+    }
+  };
+
   return (
     <Box
       sx={{
@@ -137,11 +153,11 @@ const TaskList = forwardRef<{ fetchTasks: () => void }, TaskListProps>(({ onTask
         {tasks.map((task) => (
           <ListItem
             key={task.task_id}
-            sx={{ border: '1px solid #ccc', borderRadius: '10px', marginBottom: 1, paddingLeft: '0px', justifyContent: 'space-evenly' }}
+            sx={{ border: '1px solid #ccc', borderRadius: '10px', marginBottom: 1, paddingLeft: '0px', justifyContent: 'space-evenly', height: "65px" }}
             disablePadding
           >
-            <ListItemButton onClick={() => handleTaskCompletionToggle(task)} >
-              <ListItemIcon sx={{ color: '#B8DBD9', minWidth: 'auto' }}>
+            <ListItemButton sx={{ color: '#B8DBD9', maxWidth: '40px' }} onClick={() => handleTaskCompletionToggle(task)} >
+              <ListItemIcon sx={{ color: '#B8DBD9' }}>
                 {task.completed ? <CheckBox /> : <CheckBoxOutlineBlank sx={{ width: '20px' }} />}
               </ListItemIcon>
             </ListItemButton>
@@ -202,6 +218,7 @@ const TaskList = forwardRef<{ fetchTasks: () => void }, TaskListProps>(({ onTask
           />
         </DialogContent>
         <DialogActions>
+          <Button onClick={handleDeleteTask} color="error">Delete</Button>
           <Button onClick={handleClose}>Cancel</Button>
           <Button onClick={handleSaveChanges}>Save</Button>
         </DialogActions>

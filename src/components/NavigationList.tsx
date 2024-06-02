@@ -12,8 +12,8 @@ function NavigationList() {
       case 'Tasks':
         navigate('/home/tasks');
         break;
-      case 'Settings':
-        navigate('/home/settings');
+      case 'Logout':
+        navigate('/login');
         break;
       default:
         break;
@@ -22,7 +22,7 @@ function NavigationList() {
 
   return (
     <List>
-      {['Tasks', 'Settings'].map((text, index) => (
+      {['Tasks', 'Logout'].map((text, index) => (
         <ListItem key={text} disablePadding onClick={() => handleNavigation(text)}>
           <ListItemButton sx={{
             color: '#B8DBD9',
